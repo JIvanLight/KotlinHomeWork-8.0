@@ -1,0 +1,21 @@
+package ru.jivan.data
+
+data class Note(
+    val title: String,
+    val text: String,
+    val privacy: Int,
+    val commentPrivacy: Int,
+    val privacyView: String,
+    val privacyComment: String,
+    val comments: MutableList<Comment>,
+    val deleted: Boolean = false,
+    val id: Int = 0
+){
+    data class Comment(
+        val noteId: Int,
+        val replyTo: Int,
+        val message: String,
+        val deleted: Boolean = false,
+        val id: Int = 0
+    )
+}
