@@ -7,14 +7,14 @@ data class Note(
     val commentPrivacy: Int,
     val privacyView: String,
     val privacyComment: String,
-    val comments: MutableList<Comment>,
+    val comments: MutableList<Comment> = mutableListOf(),
     val deleted: Boolean = false,
     val id: Int = 0
 ){
     data class Comment(
         val noteId: Int,
-        val replyTo: Int,
         val message: String,
+        val replyTo: Int = 0,
         val deleted: Boolean = false,
         val id: Int = 0
     )

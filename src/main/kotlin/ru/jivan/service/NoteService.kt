@@ -5,7 +5,7 @@ import ru.jivan.data.Note.Comment
 import ru.jivan.exceptions.NoteNotFoundException
 
 class NoteService {
-    private val notes: MutableList<Note> = mutableListOf()
+    val notes: MutableList<Note> = mutableListOf()
     private var lastIdNote = 0
     private var lastIdComment = 0
 
@@ -13,21 +13,21 @@ class NoteService {
         ASCENDING, DESCENDING
     }
 
-    fun add(note: Note): Int {
+    fun add(note: Note): Note {
         lastIdNote++
         val noteWithId = note.copy(id = lastIdNote)
-        notes + noteWithId
-        return noteWithId.id
+        notes.add(noteWithId)
+        return noteWithId
     }
 
-    fun createComment(noteId: Int, comment: Comment): Int {
+    fun createComment(noteId: Int, comment: Comment): Comment {
         for (element in notes) {
             if (element.deleted) continue
             if (element.id == noteId) {
                 lastIdComment++
-                val commentWithId = comment.copy(id = lastIdComment)
-                element.comments + commentWithId
-                return commentWithId.id
+                val commentWithId = comment.copy(id = lastIdComment, noteId = noteId)
+                element.comments.add(commentWithId)
+                return commentWithId
             }
         }
         throw NoteNotFoundException("Заметка с id $noteId не существует")
@@ -44,14 +44,15 @@ class NoteService {
         return false
     }
 
-    fun deleteComment(commentId: Int): Boolean {
+    fun deleteComment(noteId: Int, commentId: Int): Boolean {
         for (elementNote in notes) {
-            if (elementNote.deleted) continue
-            for ((index, elementComment) in elementNote.comments.withIndex()) {
-                if (elementComment.id == commentId && !elementComment.deleted) {
-                    val deletedComment = elementComment.copy(deleted = true)
-                    elementNote.comments[index] = deletedComment
-                    return true
+            if (elementNote.id == noteId && !elementNote.deleted) {
+                for ((index, elementComment) in elementNote.comments.withIndex()) {
+                    if (elementComment.id == commentId && !elementComment.deleted) {
+                        val deletedComment = elementComment.copy(deleted = true)
+                        elementNote.comments[index] = deletedComment
+                        return true
+                    }
                 }
             }
         }
@@ -85,14 +86,16 @@ class NoteService {
         return false
     }
 
-    fun editComment(commentId: Int, message: String): Boolean {
+    fun editComment(commentId: Int, noteId: Int, message: String): Boolean {
         for (elementNote in notes) {
             if (elementNote.deleted) continue
-            for ((index, elementComment) in elementNote.comments.withIndex()) {
-                if (elementComment.id == commentId && !elementComment.deleted) {
-                    val editedComment = elementComment.copy(message = message)
-                    elementNote.comments[index] = editedComment
-                    return true
+            if (elementNote.id == noteId) {
+                for ((index, elementComment) in elementNote.comments.withIndex()) {
+                    if (elementComment.id == commentId && !elementComment.deleted) {
+                        val editedComment = elementComment.copy(message = message)
+                        elementNote.comments[index] = editedComment
+                        return true
+                    }
                 }
             }
         }
@@ -111,7 +114,7 @@ class NoteService {
         }
         when (sort) {
             TypeSort.ASCENDING -> outList.sortBy { it.id }
-            TypeSort.DESCENDING -> outList.sortedWith(Comparator { first, second ->
+            TypeSort.DESCENDING -> outList.sortWith(Comparator { first, second ->
                 if (first.id > second.id) -1
                 else if (first.id < second.id) 1
                 else 0
@@ -151,7 +154,7 @@ class NoteService {
 
         when (sort) {
             TypeSort.ASCENDING -> outList.sortBy { it.id }
-            TypeSort.DESCENDING -> outList.sortedWith { first, second ->
+            TypeSort.DESCENDING -> outList.sortWith { first, second ->
                 if (first.id > second.id) -1
                 else if (first.id < second.id) 1
                 else 0
@@ -164,7 +167,7 @@ class NoteService {
         for (elementNote in notes) {
             if (elementNote.deleted) continue
             for ((index, elementComment) in elementNote.comments.withIndex()) {
-                if (elementComment.id == commentId && !elementComment.deleted) {
+                if (elementComment.id == commentId && elementComment.deleted) {
                     val restoredComment = elementComment.copy(deleted = false)
                     elementNote.comments[index] = restoredComment
                     return true
