@@ -2,10 +2,9 @@
 Во всём проекте опущены поля/параметры onver_id, guid и далее не указываются.
 
 fun get: опущены параметры user_id, offset, count
-     изменен тип параметра note_ids c string на List<Int>
-     изменен тип параметра sort c Int на enum class TypeSort (так как время создания заметки мы не храним, то сортируем по id)
-     
-     функция возвращает List<Note>
+     изменен тип параметра note_ids c string на List\<Int\>
+     изменен тип параметра sort c Int на enum class TypeSort (так как время создания заметки мы не храним, то сортируем по id)     
+     функция возвращает List\<Note\>
 
 fun getById: опущен параметр need_wiki
 
